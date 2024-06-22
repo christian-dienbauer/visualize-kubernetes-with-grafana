@@ -49,7 +49,7 @@ kubectl get pods -n monitoring
 To be able to access the services, we need to forward their ports respectivley. Check the service endpoints using
 
 ```bash
-
+kubectl get svc -n monitoring
 ```
 
 For Prometheus
