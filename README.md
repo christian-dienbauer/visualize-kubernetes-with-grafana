@@ -55,11 +55,11 @@ kubectl get svc -n monitoring
 For Prometheus
 
 ```bash
-
+kubectl port-forward svc/prometheus-stack-kube-p-prometheus -n monitoring 9090:9090
 ```
 
 For Grafana
 
 ```bash
-
+kubectl port-forward svc/prometheus-stack-grafana -n monitoring 3000:80
 ```
