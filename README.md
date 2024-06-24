@@ -63,3 +63,5 @@ For Grafana
 ```bash
 kubectl port-forward svc/prometheus-stack-grafana -n monitoring 3000:80
 ```
+
+You can now access Grafana via [http://127.0.0.1:3000](http://127.0.0.1:3000) and Prometheus via [http://127.0.0.1:9090](http://127.0.0.1:9090)
