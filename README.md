@@ -14,28 +14,69 @@ If you don't have a running Kubernetes cluster available, you can use minikube t
 
 ## Get Started
 
-### Install Prometheus and Grafana using Helm
+### Install Prometheus
 
 For the installation we can make use of the following Helm charts.
 
 First, let's create a namespace where we are going to deploy the services
 
 ```bash
-$ kubectl create namespace monitoring
-namespace/monitoring created
+kubectl create namespace monitoring
 ```
 
-Add the prometheus-community repository to helm.
+Add the prometheus-community repository to helm
 
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+
+```bash
 helm repo update
 ```
 
-Install the prometheus-stack
+Install prometheus
 
 ```bash
-helm install prometheus-stack prometheus-community/kube-prometheus-stack -n monitoring
+helm install prometheus prometheus-community/prometheus --namespace monitoring
+```
+<!-- Minikube specific -->
+Expose prometheus externally to access the user interface
+
+```bash
+kubectl patch svc prometheus-server -n monitoring -p '{"spec": {"type": "NodePort", "ports": [{"port": 80}]}}'
+```
+
+Verify the deployment using
+
+```bash
+kubectl get pods -n monitoring
+```
+<!-- Minikube specific -->
+Get a service URL with
+
+```bash
+minikube service prometheus-server -n monitoring
+```
+
+### Install Grafana
+
+
+Add the grafana repository to helm.
+
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+```
+
+Install Grafana
+
+```bash
+helm install grafana grafana/grafana --namespace monitoring
+```
+<!-- Minikube specific -->
+Expose grafana externally to access the user interface
+
+```bash
+kubectl patch svc grafana -n monitoring -p '{"spec": {"type": "NodePort", "ports": [{"port": 80}]}}'
 ```
 
 Verify the deployment using
@@ -44,24 +85,14 @@ Verify the deployment using
 kubectl get pods -n monitoring
 ```
 
-### Login to Prometheus and Grafana using Minikube
-
-To be able to access the services, we need to forward their ports respectivley. Check the service endpoints using
+Get the admin password
 
 ```bash
-kubectl get svc -n monitoring
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
-
-For Prometheus
+<!-- Minikube specific -->
+Get a service URL with
 
 ```bash
-kubectl port-forward svc/prometheus-stack-kube-p-prometheus -n monitoring 9090:9090
+minikube service grafana -n monitoring
 ```
-
-For Grafana
-
-```bash
-kubectl port-forward svc/prometheus-stack-grafana -n monitoring 3000:80
-```
-
-You can now access Grafana via [http://127.0.0.1:3000](http://127.0.0.1:3000) and Prometheus via [http://127.0.0.1:9090](http://127.0.0.1:9090)
