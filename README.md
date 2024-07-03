@@ -1,8 +1,6 @@
-# visualize-kubernetes-cluster
+# visualize-kubernetes-cluster-via-grafana
 
 This project demonstrates how to deploy Prometheus and Grafana on a Minikube cluster to visualize the metrics from the Kubernetes cluster. Prometheus is used for collecting and storing metrics, while Grafana is used for visualizing these metrics in an easy-to-understand dashboard.
-
-<!-- add information on how to install a dashboard -->
 
 ## Table of Contents
 
@@ -87,10 +85,12 @@ Verify the deployment using
 kubectl get pods -n monitoring
 ```
 
+![Verify that the pods are running](images/pods.png)
+
 Forward the Grafana service port to your local machine:
 
 ```bash
-kubectl port-forward service/grafana 3000:80
+kubectl port-forward service/grafana 3000:80 --namespace monitoring
 ```
 
 Get the admin password
@@ -103,15 +103,24 @@ Now, open your browser and go to [http://localhost:3000](http://localhost:3000).
 
 ## Configuration
 
+Get the service endpoint of the Prometheus server:
+
+```bash
+kubectl get svc --namespace monitoring | grep prometheus-server
+```
+
+![endpoint prometheus-server](images/prometheus-server-endpoint.png)
+
 After logging into Grafana, add Prometheus as a data source:
 
-1. Go to Configuration > Data Sources.
-2. Click "Add data source".
-3. Select "Prometheus".
-4. Set the URL to http://prometheus-server.default.svc.cluster.local:80.
-5. Click "Save & Test".
+1. Go to Connections > Add new connection.
+2. Select "Prometheus".
+3. Set the URL to match the prometheus-server endpoint, e.g. *http://10.101.162.137:80*.
+4. Click "Save & Test".
 
 Create dashboards in Grafana to visualize metrics collected by Prometheus.
+
+![View metrics](images/metrics.png)
 
 ## Usage
 
@@ -126,27 +135,3 @@ Contributions are welcome! Please submit a pull request or open an issue to disc
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-<!-- Minikube specific
-Expose prometheus externally to access the user interface
-
-```bash
-kubectl patch svc prometheus-server -n monitoring -p '{"spec": {"type": "NodePort", "ports": [{"port": 80}]}}'
-```
-
-Get a service URL with
-
-```bash
-minikube service prometheus-server -n monitoring
-```
-
-```bash
-kubectl patch svc grafana -n monitoring -p '{"spec": {"type": "NodePort", "ports": [{"port": 80}]}}'
-```
-
-Get a service URL with
-
-```bash
-minikube service grafana -n monitoring
-```
- -->
